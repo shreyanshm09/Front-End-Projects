@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Pure HTML & CSS Ludo Board</title>
+    <style>
+        :root {
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --yellow: #f1c40f;
+            --blue: #3498db;
+            --white: #ffffff;
+            --border: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f6fa;
+            margin: 0;
+        }
+
+        /* 15x15 Grid Layout for the entire Ludo Board */
+        .ludo-board {
+            display: grid;
+            grid-template-columns: repeat(15, 45px);
+            grid-template-rows: repeat(15, 45px);
+            border: 5px solid var(--border);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            background-color: var(--white);
+        }
+
+        /* Standard track cell styling */
+        .cell {
+            border: 1px solid #bdc3c7;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Home Bases spanning 6x6 grid areas */
+        .home-base {
+            grid-column: span 6;
+            grid-row: span 6;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .red-base { background-color: var(--red); grid-column: 1 / 7; grid-row: 1 / 7; }
+        .green-base { background-color: var(--green); grid-column: 10 / 16; grid-row: 1 / 7; }
+        .blue-base { background-color: var(--blue); grid-column: 1 / 7; grid-row: 10 / 16; }
+        .yellow-base { background-color: var(--yellow); grid-column: 10 / 16; grid-row: 10 / 16; }
+
+        /* White inner quadrant for holding tokens */
+        .inner-box {
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 15px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Decorative Center Multi-Color Goal Area */
+        .center-home {
+            grid-column: 7 / 10;
+            grid-row: 7 / 10;
+            border: 2px solid var(--border);
+            box-sizing: border-box;
+            background: conic-gradient(
+                var(--red) 0deg 90deg, 
+                var(--green) 90deg 180deg, 
+                var(--yellow) 180deg 270deg, 
+                var(--blue) 270deg 360deg
+            );
+        }
+
+        /* Color classes for runways, home paths, and special tiles */
+        .bg-red { background-color: var(--red); }
+        .bg-green { background-color: var(--green); }
+        .bg-yellow { background-color: var(--yellow); }
+        .bg-blue { background-color: var(--blue); }
+
+        /* Tokens/Pawns Styling & Keyframe Animation hooks */
+        .token {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--white);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            
+            /* Idle floating animation */
+            animation: floatToken 3s ease-in-out infinite;
+        }
+
+        /* Stagger the animations slightly so they don't move completely in sync */
+        .inner-box div:nth-child(2) { animation-delay: 0.4s; }
+        .inner-box div:nth-child(3) { animation-delay: 0.8s; }
+        .inner-box div:nth-child(4) { animation-delay: 1.2s; }
+
+        /* Interactive Hover effect on tokens */
+        .token:hover {
+            transform: scale(1.25) translateY(-4px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Star indicators for safe zones with pulsing glow animation */
+        .star {
+            animation: pulseSafeZone 2.5s infinite alternate ease-in-out;
+        }
+        .star::after {
+            content: "★";
+            font-size: 22px;
+            color: #7f8c8d;
+        }
+        .star.bg-red::after, .star.bg-green::after, 
+        .star.bg-yellow::after, .star.bg-blue::after {
+            color: var(--white);
+        }
+
+        /* --- ANIMATIONS DEFINITIONS --- */
+        
+        /* Token subtle floating effect */
+        @keyframes floatToken {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Safe zone glowing pulse effect */
+        @keyframes pulseSafeZone {
+            0% {
+                filter: brightness(1);
+                box-shadow: inset 0 0 0px rgba(255,255,255,0);
+            }
+            100% {
+                filter: brightness(1.08);
+                box-shadow: inset 0 0 8px rgba(255,255,255,0.6);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ludo-board">
+        <!-- RED HOME BASE (Top Left) -->
+        <div class="home-base red-base">
+            <div class="inner-box">
+                <div class="token bg-red"></div>
+                <div class="token bg-red"></div>
+                <div class="token bg-red"></div>
+                <div class="token bg-red"></div>
+            </div>
+        </div>
+
+        <!-- TOP TRACKS (Green Runway & Common Path) -->
+        <!-- Row 1 --> <div class="cell"></div><div class="cell star"></div><div class="cell"></div>
+        <!-- GREEN HOME BASE (Top Right) -->
+        <div class="home-base green-base">
+            <div class="inner-box">
+                <div class="token bg-green"></div>
+                <div class="token bg-green"></div>
+                <div class="token bg-green"></div>
+                <div class="token bg-green"></div>
+            </div>
+        </div>
+
+        <!-- Row 2 --> <div class="cell"></div><div class="cell bg-green"></div><div class="cell bg-green"></div>
+        <!-- Row 3 --> <div class="cell"></div><div class="cell bg-green"></div><div class="cell"></div>
+        <!-- Row 4 --> <div class="cell"></div><div class="cell bg-green"></div><div class="cell"></div>
+        <!-- Row 5 --> <div class="cell"></div><div class="cell bg-green"></div><div class="cell"></div>
+        <!-- Row 6 --> <div class="cell"></div><div class="cell bg-green"></div><div class="cell"></div>
+
+        <!-- LEFT & RIGHT MID TRACKS (Red & Yellow Runways) -->
+        <!-- Row 7 -->
+        <div class="cell"></div><div class="cell bg-red star"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <!-- Space for Center Goal Area Placements -->
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+        <!-- Row 8 (Home Paths) -->
+        <div class="cell"></div><div class="cell bg-red"></div><div class="cell bg-red"></div><div class="cell bg-red"></div><div class="cell bg-red"></div><div class="cell bg-red"></div>
+        <!-- CENTER GOAL AREA -->
+        <div class="center-home"></div>
+        <div class="cell bg-yellow"></div><div class="cell bg-yellow"></div><div class="cell bg-yellow"></div><div class="cell bg-yellow"></div><div class="cell bg-yellow"></div><div class="cell"></div>
+
+        <!-- Row 9 -->
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell bg-yellow star"></div><div class="cell"></div>
+
+        <!-- BLUE HOME BASE (Bottom Left) -->
+        <div class="home-base blue-base">
+            <div class="inner-box">
+                <div class="token bg-blue"></div>
+                <div class="token bg-blue"></div>
+                <div class="token bg-blue"></div>
+                <div class="token bg-blue"></div>
+            </div>
+        </div>
+
+        <!-- BOTTOM TRACKS (Blue Runway & Common Path) -->
+        <!-- Row 10 --> <div class="cell"></div><div class="cell bg-blue"></div><div class="cell"></div>
+        <!-- YELLOW HOME BASE (Bottom Right) -->
+        <div class="home-base yellow-base">
+            <div class="inner-box">
+                <div class="token bg-yellow"></div>
+                <div class="token bg-yellow"></div>
+                <div class="token bg-yellow"></div>
+                <div class="token bg-yellow"></div>
+            </div>
+        </div>
+
+        <!-- Row 11 --> <div class="cell"></div><div class="cell bg-blue"></div><div class="cell"></div>
+        <!-- Row 12 --> <div class="cell"></div><div class="cell bg-blue"></div><div class="cell"></div>
+        <!-- Row 13 --> <div class="cell"></div><div class="cell bg-blue"></div><div class="cell"></div>
+        <!-- Row 14 --> <div class="cell bg-blue"></div><div class="cell bg-blue"></div><div class="cell"></div>
+        <!-- Row 15 --> <div class="cell"></div><div class="cell star"></div><div class="cell"></div>
+    </div>
+
+</body>
+</html>
